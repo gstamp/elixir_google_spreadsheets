@@ -37,27 +37,27 @@ defmodule GSS.Spreadsheet do
   @doc """
   Get spreadsheet internal id.
   """
-  @spec id(pid) :: String.t()
-  def id(pid) do
-    GenServer.call(pid, :id)
+  @spec id(pid, Keyword.t()) :: String.t()
+  def id(pid, options \\ []) do
+    gen_server_call(pid, :id, options)
   end
 
   @doc """
   Get spreadsheet properties.
   """
-  @spec properties(pid) :: map()
-  def properties(pid) do
-    GenServer.call(pid, :properties)
+  @spec properties(pid, Keyword.t()) :: map()
+  def properties(pid, options \\ []) do
+    gen_server_call(pid, :properties, options)
   end
 
   @doc """
   Get spreadsheet sheets from properties.
   """
   @spec sheets(pid, Keyword.t()) :: [map()] | map()
-  def sheets(pid, opts \\ []) do
-    with {:ok, %{"sheets" => sheets}} <- GenServer.call(pid, :properties),
+  def sheets(pid, options \\ []) do
+    with {:ok, %{"sheets" => sheets}} <- gen_server_call(pid, :properties, options),
          {:is_raw_response?, false, _} <-
-           {:is_raw_response?, Keyword.get(opts, :raw, false), sheets} do
+           {:is_raw_response?, Keyword.get(options, :raw, false), sheets} do
       Enum.reduce(sheets, %{}, fn %{"properties" => %{"title" => title} = properties}, acc ->
         Map.put(acc, title, properties)
       end)
@@ -73,17 +73,17 @@ defmodule GSS.Spreadsheet do
   @doc """
   Get total amount of rows in a spreadsheet.
   """
-  @spec rows(pid) :: {:ok, integer()} | {:error, Exception.t()}
-  def rows(pid) do
-    GenServer.call(pid, :rows)
+  @spec rows(pid, Keyword.t()) :: {:ok, integer()} | {:error, Exception.t()}
+  def rows(pid, options \\ []) do
+    gen_server_call(pid, :rows, options)
   end
 
   @doc """
   Granural read by a custom range from a spreadsheet.
   """
-  @spec fetch(pid, String.t()) :: {:ok, spreadsheet_data} | {:error, Exception.t()}
-  def fetch(pid, range) do
-    GenServer.call(pid, {:fetch, range})
+  @spec fetch(pid, String.t(), Keyword.t()) :: {:ok, spreadsheet_data} | {:error, Exception.t()}
+  def fetch(pid, range, options \\ []) do
+    gen_server_call(pid, {:fetch, range}, options)
   end
 
   @doc """
